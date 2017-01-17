@@ -19,3 +19,5 @@ Except the function the original program has, I added three modes:
 2. toyallframes. This mode will record the result images for all the frames.
 
 3. toyboxes. This mode will record all the coordinates for all boxes in each image.
+
+Their usages are the same as the recall, train, etc., modes in the original darknet program.
