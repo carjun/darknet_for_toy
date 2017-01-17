@@ -30,6 +30,7 @@ extern void run_go(int argc, char **argv);
 extern void run_art(int argc, char **argv);
 extern void run_super(int argc, char **argv);
 
+
 void change_rate(char *filename, float scale, float add)
 {
     // Ready for some weird shit??
