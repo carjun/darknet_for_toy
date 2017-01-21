@@ -12,7 +12,7 @@ This is a modified version to do the detection work on the 24-toy dataset.
 
 In other words, it cannot be directy applied to other different datasets.
 
-Except the function the original program has, I added three modes:
+Except the modes the original Darknet has, I added three modes:
 
 1. toymap. This mode will record precisions and recalls for different thresholds.
 
@@ -20,4 +20,4 @@ Except the function the original program has, I added three modes:
 
 3. toyboxes. This mode will record all the coordinates for all boxes in each image.
 
-Their usages are the same as the recall, train, etc., modes in the original darknet program.
+Their usages are the same as the recall, train, etc., modes in the original Darknet.
