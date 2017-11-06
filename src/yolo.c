@@ -522,7 +522,7 @@ void validate_yolo_recall_video(char *cfgfile, char *weightfile)
     }
 }
 
-void validate_yolo_recall_coordinates(char *cfgfile, char *weightfile)
+void validate_yolo_recall_coordinates(char *cfgfile, char *weightfile, char *filename, char *output_filename)
 {
     network net = parse_network_cfg(cfgfile);
     if(weightfile){
@@ -535,7 +535,9 @@ void validate_yolo_recall_coordinates(char *cfgfile, char *weightfile)
     char *base = "results/comp4_det_test_";
     //list *plist = get_paths("data/voc.2007.test");
     //list *plist = get_paths("data/test_toy.txt");
-    list *plist = get_paths("/l/vision/v3/sbambach/_postdoc/marr/exp12/__20161022_17878/child_data.txt");
+    // list *plist = get_paths("/l/vision/v3/sbambach/_postdoc/marr/exp12/__20161022_17878/child_data.txt");
+    list *plist = get_paths(filename);
+
 //    list *plist = get_paths("/l/vision/v3/sbambach/_postdoc/marr/exp12/__20161022_17878/parent_data.txt");
     char **paths = (char **)list_to_array(plist);
 
@@ -546,11 +548,11 @@ void validate_yolo_recall_coordinates(char *cfgfile, char *weightfile)
 
     int j, k;
     FILE **fps = calloc(classes, sizeof(FILE *));
-    for(j = 0; j < classes; ++j){
-        char buff[1024];
-        snprintf(buff, 1024, "%s%s.txt", base, voc_names[j]);
-        fps[j] = fopen(buff, "w");
-    }
+    // for(j = 0; j < classes; ++j){
+    //     char buff[1024];
+    //     snprintf(buff, 1024, "%s%s.txt", base, voc_names[j]);
+    //     fps[j] = fopen(buff, "w");
+    // }
     box *boxes = calloc(side*side*l.n, sizeof(box));
     float **probs = calloc(side*side*l.n, sizeof(float *));
     for(j = 0; j < side*side*l.n; ++j) probs[j] = calloc(classes, sizeof(float *));
@@ -574,6 +576,9 @@ void validate_yolo_recall_coordinates(char *cfgfile, char *weightfile)
 
     for(i = 0; i < m; ++i){
         char *path = paths[i];
+
+        fprintf(stderr, "Image: %s\n", path);
+
         image orig = load_image_color(path, 0, 0);
         image sized = resize_image(orig, net.w, net.h);
         char *id = basecfg(path);
@@ -584,7 +589,10 @@ void validate_yolo_recall_coordinates(char *cfgfile, char *weightfile)
         if (nms) do_nms(boxes, probs, side*side*l.n, 1, nms);
         
 		char *imagepath = find_replace(path, "/l/vision/v3/sbambach/_postdoc/marr/exp12/_", "_");
-        FILE *xywh = fopen("/l/vision/v3/sbambach/_postdoc/marr/exp12/__20161022_17878/__20161022_17878_c_xywh.txt", "a");
+        // FILE *xywh = fopen("/l/vision/v3/sbambach/_postdoc/marr/exp12/__20161022_17878/__20161022_17878_c_xywh.txt", "a");
+        
+        // FILE *xywh = fopen("/l/vision/v3/sbambach/_postdoc/marr/darknet_for_toy/output.txt", "a");
+        FILE *xywh = fopen(output_filename, "a");
 		
         for(j = 0; j < classes; j++){
             int flag = 0;
@@ -1421,13 +1429,14 @@ void run_yolo(int argc, char **argv)
     char *cfg = argv[3];
     char *weights = (argc > 4) ? argv[4] : 0;
     char *filename = (argc > 5) ? argv[5]: 0;
+    char *output_filename = (argc > 6) ? argv[6]: 0;
     if(0==strcmp(argv[2], "test")) test_yolo(cfg, weights, filename, thresh);
     else if(0==strcmp(argv[2], "train")) train_yolo(cfg, weights);
     else if(0==strcmp(argv[2], "valid")) validate_yolo(cfg, weights);
     else if(0==strcmp(argv[2], "recall")) validate_yolo_recall(cfg, weights);
     else if(0==strcmp(argv[2], "toymap")) validate_yolo_recall_toy(cfg, weights);//Record precisions and recalls for different thresholds
     else if(0==strcmp(argv[2], "toyallframes")) validate_yolo_recall_video(cfg, weights);//Record the result images for all frames
-	else if(0==strcmp(argv[2], "toyboxes")) validate_yolo_recall_coordinates(cfg, weights);//Record all the coordinates for all boxes in each image
+	else if(0==strcmp(argv[2], "toyboxes")) validate_yolo_recall_coordinates(cfg, weights, filename, output_filename);//Record all the coordinates for all boxes in each image
     //else if(0==strcmp(argv[2], "demo")) demo(cfg, weights, thresh, cam_index, filename, voc_names, voc_labels, 20, frame_skip);
     else if(0==strcmp(argv[2], "demo")) demo(cfg, weights, thresh, cam_index, filename, voc_names, voc_labels, 24, frame_skip);
 }
