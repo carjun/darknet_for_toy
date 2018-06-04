@@ -31,6 +31,9 @@
 int get_current_batch(network net)
 {
     int batch_num = (*net.seen)/(net.batch*net.subdivisions);
+
+    // printf("Sven batch_num: %i, net.seen: %i, net.batch: %i, net.subdivisions: %i\n", batch_num, *net.seen, net.batch, net.subdivisions);
+
     return batch_num;
 }
 
@@ -135,6 +138,9 @@ network make_network(int n)
     net.n = n;
     net.layers = calloc(net.n, sizeof(layer));
     net.seen = calloc(1, sizeof(int));
+    // printf("Sven net.seen: %i \n", *net.seen);
+
+
     #ifdef GPU
     net.input_gpu = calloc(1, sizeof(float *));
     net.truth_gpu = calloc(1, sizeof(float *));

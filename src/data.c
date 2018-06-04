@@ -32,7 +32,7 @@ char **get_random_paths_indexes(char **paths, int n, int m, int *indexes)
         int index = rand_r(&data_seed)%m;
         indexes[i] = index;
         random_paths[i] = paths[index];
-        if(i == 0) printf("%s\n", paths[index]);
+        // if(i == 0) printf("%s\n", paths[index]);
     }
     pthread_mutex_unlock(&mutex);
     return random_paths;
@@ -46,7 +46,7 @@ char **get_random_paths(char **paths, int n, int m)
     for(i = 0; i < n; ++i){
         int index = rand_r(&data_seed)%m;
         random_paths[i] = paths[index];
-        if(i == 0) printf("%s\n", paths[index]);
+        // if(i == 0) printf("%s\n", paths[index]);
     }
     pthread_mutex_unlock(&mutex);
     return random_paths;

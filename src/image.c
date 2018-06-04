@@ -1057,6 +1057,7 @@ image load_image_stb(char *filename, int channels)
     unsigned char *data = stbi_load(filename, &w, &h, &c, channels);
     if (!data) {
         fprintf(stderr, "Cannot load image \"%s\"\nSTB Reason: %s\n", filename, stbi_failure_reason());
+        // fprintf(stderr, "Sven Cannot load image %s \nSTB Reason: %s\n", filename, stbi_failure_reason());
         exit(0);
     }
     if(channels) c = channels;
@@ -1072,6 +1073,7 @@ image load_image_stb(char *filename, int channels)
         }
     }
     free(data);
+    // fprintf(stderr, "Sven image %s loaded\n", filename);
     return im;
 }
 

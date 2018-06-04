@@ -15,17 +15,34 @@
 char *voc_names[] = {"helmet", "house", "blue car", "rose", "elephant", "snowman", "rabbit", "spongebob", "turtle", "gavel", "ladybug", "praying mantis", "green car", "saw", "doll", "phone", "rubik\'s cube", "rake", "truck", "white car", "lady bug rattle", "cube", "bed", "cube with ball"};
 image voc_labels[24];
 
-void train_yolo(char *cfgfile, char *weightfile)
+void train_yolo(char *cfgfile, char *weightfile, char *train_images, char *backup_directory)
+// void train_yolo(char *cfgfile, char *weightfile)
 {
     //char *train_images = "/data/voc/train.txt";
      //char *train_images = "/l/vision/v3/zehzhang/train.txt";
-     char *train_images = "/l/vision/v3/zehzhang/toy_data/train_toy_2.txt";
+
+     // char *train_images = "/l/vision/v3/zehzhang/toy_data/train_toy_2.txt";
+
     //char *backup_directory = "/home/pjreddie/backup/";
      //char *backup_directory = "/l/vision/v3/zehzhang/backup_weights/";
-     char *backup_directory = "/l/vision/v3/zehzhang/toy_data/backup_weights_toy_2/";
+
+     // char *backup_directory = "/l/vision/v3/zehzhang/toy_data/backup_weights_toy_2/";
+
       //char *backup_directory = "/l/vision/v3/zehzhang/toy_data/backup_weights_toy_restart/";
      //char *backup_directory = "/l/vision/v3/zehzhang/toy_data/backup_weights_toy/";
      //char *backup_directory = "/l/vision/v3/zehzhang/toy_data/backup_weights_test/";
+
+
+    // char *train_images = "/data/sbambach/yolo/dianzhi_scripts/training_data/training.txt";
+    // char *backup_directory = "/data/sbambach/yolo/trained_model_weights";
+
+    // printf("test: %s\n", weightfile);
+
+    // if(strcmp(weightfile, '0')){
+    //     printf("POSITIVE!");
+    // }
+
+
     srand(time(0));
     data_seed = time(0);
     char *base = basecfg(cfgfile);
@@ -36,6 +53,7 @@ void train_yolo(char *cfgfile, char *weightfile)
         load_weights(&net, weightfile);
     }
     printf("Learning Rate: %g, Momentum: %g, Decay: %g\n", net.learning_rate, net.momentum, net.decay);
+    *net.seen = 0;
     int imgs = net.batch*net.subdivisions;
     int i = *net.seen/imgs;
     data train, buffer;
@@ -71,6 +89,11 @@ void train_yolo(char *cfgfile, char *weightfile)
     pthread_t load_thread = load_data_in_thread(args);
     clock_t time;
     //while(i*imgs < N*120){
+
+
+    // printf("Sven: %i and %i\n", get_current_batch(net), net.max_batches);
+
+
     while(get_current_batch(net) < net.max_batches){
         i += 1;
         time=clock();
@@ -78,14 +101,14 @@ void train_yolo(char *cfgfile, char *weightfile)
         train = buffer;
         load_thread = load_data_in_thread(args);
 
-        printf("Loaded: %lf seconds\n", sec(clock()-time));
+        // printf("Loaded: %lf seconds\n", sec(clock()-time));
 
         time=clock();
         float loss = train_network(net, train);
         if (avg_loss < 0) avg_loss = loss;
         avg_loss = avg_loss*.9 + loss*.1;
 
-        printf("%d: %f, %f avg, %f rate, %lf seconds, %d images\n", i, loss, avg_loss, get_current_rate(net), sec(clock()-time), i*imgs);
+        printf("%d: Loss: %.3f, avg. Loss: %.3f, learning rate: %f, %.2lf seconds, %d images\n", i, loss, avg_loss, get_current_rate(net), sec(clock()-time), i*imgs);
         if(i%1000==0 || (i < 1000 && i%100 == 0)){
             char buff[256];
             sprintf(buff, "%s/%s_%d.weights", backup_directory, base, i);
@@ -1427,16 +1450,18 @@ void run_yolo(int argc, char **argv)
     }
 
     char *cfg = argv[3];
-    char *weights = (argc > 4) ? argv[4] : 0;
-    char *filename = (argc > 5) ? argv[5]: 0;
-    char *output_filename = (argc > 6) ? argv[6]: 0;
-    if(0==strcmp(argv[2], "test")) test_yolo(cfg, weights, filename, thresh);
-    else if(0==strcmp(argv[2], "train")) train_yolo(cfg, weights);
+    char *input_filename = (argc > 4) ? argv[4]: 0;
+    char *output_filename = (argc > 5) ? argv[5]: 0;
+    char *weights = (argc > 6) ? argv[6] : 0;
+
+    if(0==strcmp(argv[2], "test")) test_yolo(cfg, weights, input_filename, thresh);
+    else if(0==strcmp(argv[2], "train")) train_yolo(cfg, weights, input_filename, output_filename);
+    // else if(0==strcmp(argv[2], "train")) train_yolo(cfg, weights);
     else if(0==strcmp(argv[2], "valid")) validate_yolo(cfg, weights);
     else if(0==strcmp(argv[2], "recall")) validate_yolo_recall(cfg, weights);
     else if(0==strcmp(argv[2], "toymap")) validate_yolo_recall_toy(cfg, weights);//Record precisions and recalls for different thresholds
     else if(0==strcmp(argv[2], "toyallframes")) validate_yolo_recall_video(cfg, weights);//Record the result images for all frames
-	else if(0==strcmp(argv[2], "toyboxes")) validate_yolo_recall_coordinates(cfg, weights, filename, output_filename);//Record all the coordinates for all boxes in each image
+	else if(0==strcmp(argv[2], "getboxes")) validate_yolo_recall_coordinates(cfg, weights, input_filename, output_filename);//Record all the coordinates for all boxes in each image
     //else if(0==strcmp(argv[2], "demo")) demo(cfg, weights, thresh, cam_index, filename, voc_names, voc_labels, 20, frame_skip);
-    else if(0==strcmp(argv[2], "demo")) demo(cfg, weights, thresh, cam_index, filename, voc_names, voc_labels, 24, frame_skip);
+    else if(0==strcmp(argv[2], "demo")) demo(cfg, weights, thresh, cam_index, input_filename, voc_names, voc_labels, 24, frame_skip);
 }
