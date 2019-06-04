@@ -16,7 +16,7 @@ In other words, it cannot be directy applied to other different datasets.
 
 ## Running YOLO to detect objects:
 
-`./darknet yolo getboxes $network_config_file $trained_network_weights $input_text_file $outout_text_file`
+`./darknet yolo getboxes $network_config_file $input_text_file $outout_text_file $trained_network_weights`
 
 For example:
 
