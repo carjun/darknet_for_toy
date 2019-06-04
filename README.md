@@ -14,6 +14,11 @@ This is a modified version to do the detection work on the 24-toy dataset.
 
 In other words, it cannot be directy applied to other different datasets.
 
+A few steps to get started: 
+
+- Add `$CUDA_PATH` to the `$PATH` variable. Verify if the path to CUDA in the `./Makefile` is correct. If you're running YOLO on Salk, the CUDA path in Makefile should be correct. 
+- `cp /data/sbambach/yolo/trained_model_weights/yolo_15_toddlers.weights ./` 
+
 ## Running YOLO to detect objects:
 
 `./darknet yolo getboxes $network_config_file $input_text_file $outout_text_file $trained_network_weights`
