@@ -23,7 +23,7 @@ def create_input_files(input_filename_prefix):
     input_filename = input_filename_prefix + sub_dir
     with open(os.path.join('../data/', input_filename), 'w') as infile: 
       # Run YOLO on each frame for each of the above subjects
-      list_child_frames = glob.glob(os.path.join(multiwork_path, sub_dir, 'cam07_frames_p/*'))
+      list_child_frames = glob.glob(os.path.join(multiwork_path, sub_dir, 'cam07_frames_p/*.jpg'))
       infile.write('\n'.join(list_child_frames))
       infile.write('\n')
 
